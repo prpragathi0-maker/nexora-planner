@@ -1,0 +1,542 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090a12">
+<title>NEXORA — Life Dashboard</title>
+<style>
+:root{
+ --bg:#090a12;--panel:#111320;--panel2:#171a2a;
+ --line:#292d42;--text:#f0f0ff;--muted:#9297b4;
+ --purple:#a78bfa;--cyan:#68e5f5;--green:#75e3b0;
+ --red:#ff7e9e;--radius:20px
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 80% 0%,#21173c 0%,transparent 35%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.app{max-width:1450px;margin:auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:28px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:45px;height:45px;border-radius:15px;background:linear-gradient(135deg,#a78bfa,#5de6ed);display:grid;place-items:center;color:#0b0b16;font-weight:900;font-size:23px;box-shadow:0 0 30px #a78bfa35}
+h1,h2,h3,p{margin-top:0}
+.brand h1{font-size:22px;letter-spacing:4px;margin:0}
+.brand small{display:block;color:var(--muted);letter-spacing:2px;font-size:10px;margin-top:4px}
+.header-right{display:flex;align-items:center;gap:12px}
+.clock{text-align:right;color:var(--cyan);font-variant-numeric:tabular-nums;font-size:14px}
+.clock small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.btn{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--panel2);color:var(--text);transition:.2s}
+.btn:hover{border-color:var(--purple);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(120deg,#a78bfa,#75dff2);color:#10101b;border:0;font-weight:750}
+.btn.danger{color:var(--red)}
+.layout{display:grid;grid-template-columns:215px minmax(0,1fr);gap:24px}
+.sidebar{background:#10111bdc;border:1px solid var(--line);border-radius:var(--radius);padding:17px;height:max-content;position:sticky;top:16px}
+.side-label{font-size:10px;color:var(--muted);letter-spacing:2px;margin:12px 10px}
+.nav{width:100%;display:flex;align-items:center;gap:12px;border:0;background:transparent;color:var(--muted);padding:13px 12px;border-radius:12px;text-align:left;margin:3px 0}
+.nav.active,.nav:hover{background:#a78bfa18;color:var(--text)}
+.nav.active{box-shadow:inset 3px 0 var(--purple)}
+.nav .ico{width:22px;text-align:center}
+.side-note{margin-top:24px;padding:14px;border-radius:14px;background:#a78bfa0d;border:1px solid #a78bfa28;color:var(--muted);font-size:12px;line-height:1.7}
+.side-note strong{color:var(--purple)}
+main{min-width:0}
+.welcome{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:22px}
+.eyebrow{font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:10px}
+.welcome h2{font-size:clamp(25px,3.5vw,37px);letter-spacing:-1px;margin-bottom:8px}
+.muted{color:var(--muted)}
+.welcome p{margin-bottom:0;font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:22px}
+.card,.panel{background:linear-gradient(145deg,#151727f5,#10121df5);border:1px solid var(--line);border-radius:var(--radius);padding:19px;min-width:0}
+.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;gap:8px}
+.stat-icon{font-size:20px}
+.stat-number{font-size:32px;font-weight:750;margin:17px 0 7px;font-variant-numeric:tabular-nums}
+.stat-foot{font-size:11px;color:var(--muted)}
+.progress{height:6px;background:#292c40;border-radius:20px;overflow:hidden;margin-top:12px}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:20px;transition:width .3s}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:18px}
+.panel{margin-bottom:18px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
+.panel-head h3{font-size:16px;margin:0}
+.panel-head p{font-size:11px;color:var(--muted);margin:5px 0 0}
+.small-btn{border:1px solid var(--line);background:#191b2b;color:var(--purple);padding:7px 10px;border-radius:9px;font-size:12px}
+.field{width:100%;background:#0c0e18;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:12px;min-width:0}
+.field::placeholder{color:#686d88}
+.field option{background:#111320}
+.form-row{display:flex;gap:9px;margin-bottom:12px}
+.form-row>*{min-width:0}
+.task-form{display:grid;grid-template-columns:minmax(0,1fr) 110px auto;gap:8px;margin-bottom:17px}
+.task-list{display:grid;gap:8px}
+.task{display:flex;align-items:center;gap:11px;background:#191b2a8a;border:1px solid #25283a;border-radius:12px;padding:12px}
+.task.done .task-title{text-decoration:line-through;color:var(--muted)}
+.check{appearance:none;flex-shrink:0;width:19px;height:19px;border:1px solid #646b88;border-radius:6px;display:grid;place-items:center;cursor:pointer}
+.check:checked{background:var(--purple);border-color:var(--purple)}
+.check:checked:after{content:"✓";font-size:13px;color:#10101b;font-weight:900}
+.task-info{flex:1;min-width:0}
+.task-title{font-size:13px;overflow-wrap:anywhere}
+.task-meta{font-size:10px;color:var(--muted);margin-top:5px}
+.priority{font-size:10px;padding:4px 7px;border-radius:7px;background:#a78bfa17;color:var(--purple);white-space:nowrap}
+.priority.High{color:var(--red);background:#ff7e9e14}
+.priority.Medium{color:#f6cb7b;background:#f6cb7b12}
+.icon-btn{border:0;background:transparent;color:var(--muted);padding:5px;font-size:17px}
+.icon-btn:hover{color:var(--red)}
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.filter{background:transparent;border:1px solid var(--line);color:var(--muted);padding:7px 11px;border-radius:9px;font-size:11px}
+.filter.active{background:#a78bfa18;border-color:var(--purple);color:var(--text)}
+.empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:12px;line-height:1.8}
+.goal{padding:13px 0;border-bottom:1px solid var(--line)}
+.goal:last-child{border-bottom:0}
+.goal-row{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px}
+.goal-row strong{font-weight:600}
+.goal .progress{margin-top:10px}
+.goal .progress span{background:linear-gradient(90deg,#a78bfa,#68e5f5)}
+.habit-list{display:grid;gap:9px}
+.habit{display:flex;align-items:center;gap:10px;background:#191b2a8a;border:1px solid #25283a;padding:12px;border-radius:12px;font-size:12px}
+.habit .check{margin-left:auto}
+.habit.done{border-color:#75e3b055;color:var(--green)}
+.notes{width:100%;min-height:150px;resize:vertical;line-height:1.7}
+.save-line{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:11px;color:var(--muted)}
+.timer{text-align:center;padding:10px 0}
+.timer-mode{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
+.timer-display{font-size:clamp(42px,7vw,64px);letter-spacing:2px;font-weight:750;font-variant-numeric:tabular-nums;margin:23px 0 10px;text-shadow:0 0 25px #a78bfa25}
+.timer-caption{color:var(--muted);font-size:12px;margin-bottom:22px}
+.timer-actions{display:flex;justify-content:center;gap:8px}
+.quote{color:#d5d0f7;font-size:14px;line-height:1.8}
+.quote-mark{font-size:30px;color:var(--purple)}
+footer{text-align:center;padding:15px;color:#626783;font-size:10px;letter-spacing:2px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);background:#20243a;border:1px solid #4d4e72;color:var(--text);padding:12px 18px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:10;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.section{display:none}
+.section.active{display:block}
+.section-heading{margin:0 0 18px;font-size:25px}
+.subtext{color:var(--muted);font-size:12px;line-height:1.7}
+.mobile-nav{display:none}
+@media(max-width:1000px){
+ .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .content-grid{grid-template-columns:1fr}
+ .sidebar{position:static}
+}
+@media(min-width:701px){
+ .sidebar{display:block}
+}
+@media(max-width:700px){
+ .app{padding:14px 13px 90px}
+ header{margin-bottom:22px;align-items:center}
+ .brand h1{font-size:18px;letter-spacing:3px}
+ .brand small{font-size:8px;letter-spacing:1px}
+ .logo{width:39px;height:39px}
+ .clock{display:none}
+ .header-right .btn{padding:9px;font-size:11px}
+ .layout{display:block}
+ .sidebar{display:none}
+ .welcome{align-items:flex-start;flex-direction:column}
+ .welcome h2{font-size:28px}
+ .cards{gap:9px}
+ .card,.panel{padding:14px;border-radius:16px}
+ .stat-number{font-size:27px}
+ .stat-top{font-size:11px}
+ .stat-foot{font-size:10px}
+ .content-grid{gap:0}
+ .task-form{grid-template-columns:minmax(0,1fr) auto}
+ .task-form select{grid-column:1}
+ .task-form button{grid-column:2;grid-row:1/3}
+ .mobile-nav{display:flex;position:fixed;z-index:5;bottom:0;left:0;right:0;justify-content:space-around;gap:3px;background:#0c0d18f5;border-top:1px solid var(--line);padding:8px 3px calc(8px + env(safe-area-inset-bottom));backdrop-filter:blur(18px)}
+ .mobile-nav .nav{display:flex;flex-direction:column;gap:3px;padding:7px 2px;margin:0;align-items:center;justify-content:center;font-size:9px;border-radius:10px}
+ .mobile-nav .ico{font-size:18px}
+ .mobile-nav .nav.active{box-shadow:inset 0 2px var(--purple)}
+ .panel-head h3{font-size:15px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand">
+  <div class="logo">N</div>
+  <div><h1>NEXORA</h1><small>YOUR PERSONAL COMMAND CENTER</small></div>
+ </div>
+ <div class="header-right">
+  <div class="clock"><span id="clock">00:00:00</span><small id="dateLabel">Loading date...</small></div>
+  <button class="btn" id="exportBtn">↗ Export</button>
+ </div>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+ <div class="side-label">WORKSPACE</div>
+ <button class="nav active" data-page="dashboard"><span class="ico">◈</span> Dashboard</button>
+ <button class="nav" data-page="tasks"><span class="ico">☷</span> My Tasks</button>
+ <button class="nav" data-page="goals"><span class="ico">◎</span> Goals & Habits</button>
+ <button class="nav" data-page="notes"><span class="ico">▤</span> Quick Notes</button>
+ <button class="nav" data-page="focus"><span class="ico">◷</span> Focus Room</button>
+ <div class="side-note"><strong>✦ YOUR SPACE</strong><br>Small steps. Clear mind. Better days.<br><br><span id="sideDate">One day at a time.</span></div>
+</aside>
+
+<main>
+<section class="section active" id="page-dashboard">
+ <div class="welcome">
+  <div><div class="eyebrow">✦ YOUR PERSONAL SPACE</div><h2 id="greeting">Welcome back.</h2><p class="muted">Your future is built by what you do today.</p></div>
+  <button class="btn primary" data-go="tasks">＋ New task</button>
+ </div>
+ <div class="cards">
+  <div class="card"><div class="stat-top">Total tasks <span class="stat-icon">☷</span></div><div class="stat-number" id="statTotal">0</div><div class="stat-foot">Tasks in your workspace</div></div>
+  <div class="card"><div class="stat-top">Completed <span class="stat-icon">✓</span></div><div class="stat-number" id="statDone">0</div><div class="stat-foot">Tasks checked off</div></div>
+  <div class="card"><div class="stat-top">Daily progress <span class="stat-icon">◉</span></div><div class="stat-number" id="statProgress">0%</div><div class="progress"><span id="progressBar"></span></div></div>
+  <div class="card"><div class="stat-top">Habits today <span class="stat-icon">✧</span></div><div class="stat-number" id="statHabits">0/3</div><div class="stat-foot">Your daily check-ins</div></div>
+ </div>
+ <div class="content-grid">
+  <div>
+   <div class="panel">
+    <div class="panel-head"><div><h3>Today's Mission</h3><p>One task at a time.</p></div><button class="small-btn" data-go="tasks">View all ↗</button></div>
+    <div id="dashTasks" class="task-list"></div>
+   </div>
+   <div class="panel">
+    <div class="panel-head"><div><h3>Goal Tracker</h3><p>Keep moving forward.</p></div><button class="small-btn" data-go="goals">Manage</button></div>
+    <div id="dashGoals"></div>
+   </div>
+  </div>
+  <div>
+   <div class="panel">
+    <div class="panel-head"><div><h3>Daily Habits</h3><p>Show up for yourself.</p></div></div>
+    <div id="dashHabits" class="habit-list"></div>
+   </div>
+   <div class="panel">
+    <div class="panel-head"><div><h3>Focus Room</h3><span>◷</span></div></div>
+    <div class="timer"><div class="timer-display" id="timerDisplay">25:00</div><div class="timer-caption" id="timerCaption">Ready when you are.</div><div class="timer-actions"><button class="btn primary" id="timerStart">▶ Start</button><button class="btn" id="timerReset">↺ Reset</button></div></div>
+    <button class="small-btn" data-go="focus" style="width:100%">Open focus room ↗</button>
+   </div>
+   <div class="panel"><div class="quote-mark">“</div><div class="quote" id="dailyQuote">Your next chapter starts with one small step.</div><p class="muted" style="font-size:10px;margin:10px 0 0">A LITTLE REMINDER</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="page-tasks">
+ <div class="eyebrow">WORKSPACE / TASKS</div><h2 class="section-heading">My Tasks<span style="color:var(--purple)">.</span></h2>
+ <p class="subtext">Capture it. Prioritize it. Get it done.</p>
+ <div class="panel">
+  <div class="panel-head"><div><h3>Create a task</h3><p>Make your next step clear.</p></div></div>
+  <form id="taskForm" class="task-form">
+   <input class="field" id="taskInput" placeholder="What needs to be done?" maxlength="160" required>
+   <select class="field" id="taskPriority" aria-label="Priority"><option>Low</option><option selected>Medium</option><option>High</option></select>
+   <button class="btn primary" type="submit">＋ Add</button>
+  </form>
+  <div class="filters">
+   <button class="filter active" data-filter="All">All tasks</button>
+   <button class="filter" data-filter="Pending">Pending</button>
+   <button class="filter" data-filter="Completed">Completed</button>
+   <button class="filter" data-filter="High">High priority</button>
+  </div>
+  <div id="taskList" class="task-list"></div>
+ </div>
+</section>
+
+<section class="section" id="page-goals">
+ <div class="eyebrow">WORKSPACE / GROWTH</div><h2 class="section-heading">Goals & Habits<span style="color:var(--purple)">.</span></h2>
+ <p class="subtext">Progress, not perfection. Build a routine that works for you.</p>
+ <div class="content-grid">
+  <div class="panel">
+   <div class="panel-head"><div><h3>My Goals</h3><p>Track the things that matter.</p></div></div>
+   <form id="goalForm" class="form-row"><input class="field" id="goalInput" placeholder="Add a new goal..." maxlength="100" required><button class="btn primary">＋</button></form>
+   <div id="goalList"></div>
+  </div>
+  <div class="panel">
+   <div class="panel-head"><div><h3>Daily Habits</h3><p>Reset automatically each new day.</p></div></div>
+   <form id="habitForm" class="form-row"><input class="field" id="habitInput" placeholder="Add a habit..." maxlength="70" required><button class="btn primary">＋</button></form>
+   <div id="habitList" class="habit-list"></div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="page-notes">
+ <div class="eyebrow">WORKSPACE / THOUGHTS</div><h2 class="section-heading">Quick Notes<span style="color:var(--purple)">.</span></h2>
+ <p class="subtext">A quiet place for ideas, plans and reminders.</p>
+ <div class="panel">
+  <div class="panel-head"><div><h3>Your notebook</h3><p>Saved in this browser on this device.</p></div><span style="color:var(--purple)">▤</span></div>
+  <input class="field" id="noteTitle" placeholder="Note title..." maxlength="100" style="margin-bottom:12px">
+  <textarea class="field notes" id="noteBody" placeholder="Start writing your thoughts here..." maxlength="12000"></textarea>
+  <div class="save-line"><span id="noteStatus">Your notes stay in your browser.</span><button class="btn primary" id="saveNote">Save note</button></div>
+  <div class="panel-head" style="margin-top:28px"><h3>Saved notes</h3><button class="small-btn" id="newNote">＋ New</button></div>
+  <div id="savedNotes" class="task-list"></div>
+ </div>
+</section>
+
+<section class="section" id="page-focus">
+ <div class="eyebrow">WORKSPACE / DEEP WORK</div><h2 class="section-heading">Focus Room<span style="color:var(--purple)">.</span></h2>
+ <p class="subtext">One thing at a time. Give your attention room to breathe.</p>
+ <div class="panel">
+  <div class="timer">
+   <div class="eyebrow">YOUR CURRENT SESSION</div>
+   <div class="timer-display" id="focusTimerDisplay">25:00</div>
+   <div class="timer-caption" id="focusTimerCaption">Ready when you are.</div>
+   <div class="timer-mode" style="margin-bottom:22px">
+    <button class="filter active" data-minutes="25" data-mode="Focus">Focus · 25 min</button>
+    <button class="filter" data-minutes="5" data-mode="Short break">Short break · 5 min</button>
+    <button class="filter" data-minutes="15" data-mode="Long break">Long break · 15 min</button>
+   </div>
+   <div class="timer-actions"><button class="btn primary" id="focusStart">▶ Start focus</button><button class="btn" id="focusReset">↺ Reset</button></div>
+  </div>
+ </div>
+ <div class="panel"><h3>Focus ritual</h3><p class="subtext">01 — Choose one task.</p><p class="subtext">02 — Silence unnecessary distractions.</p><p class="subtext">03 — Work until the timer ends, then take a break.</p><p class="subtext">04 — Repeat at a pace that feels comfortable.</p></div>
+</section>
+</main>
+</div>
+
+<nav class="mobile-nav" aria-label="Mobile navigation">
+ <button class="nav active" data-page="dashboard"><span class="ico">◈</span>Home</button>
+ <button class="nav" data-page="tasks"><span class="ico">☷</span>Tasks</button>
+ <button class="nav" data-page="goals"><span class="ico">◎</span>Goals</button>
+ <button class="nav" data-page="notes"><span class="ico">▤</span>Notes</button>
+ <button class="nav" data-page="focus"><span class="ico">◷</span>Focus</button>
+</nav>
+<footer>NEXORA · YOUR LIFE, YOUR PACE</footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const KEY = "nexora-planner-v1";
+const today = () => {
+ const d = new Date();
+ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+};
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+const initialState = () => ({
+ tasks:[], goals:[], habits:[
+  {id:uid(),name:"Drink enough water",done:false},
+  {id:uid(),name:"Read or learn something",done:false},
+  {id:uid(),name:"Take a mindful break",done:false}
+ ], habitsDate:today(), notes:[], activeNote:null
+});
+let state = initialState();
+let filter = "All";
+let toastTimer;
+let timerMode = "Focus", timerDuration = 25*60, remaining = 25*60;
+let timerInterval = null, timerEnd = null, running = false;
+
+function loadState(){
+ try{
+  const raw = localStorage.getItem(KEY);
+  if(raw){
+   const parsed = JSON.parse(raw);
+   if(parsed && Array.isArray(parsed.tasks) && Array.isArray(parsed.goals)
+     && Array.isArray(parsed.habits) && Array.isArray(parsed.notes)){
+    state = {...initialState(),...parsed};
+   }
+  }
+ }catch(e){ console.warn("Could not load saved data",e); }
+ if(state.habitsDate !== today()){
+  state.habits.forEach(h=>h.done=false);
+  state.habitsDate=today();
+  persist(false);
+ }
+}
+function persist(showMessage=false){
+ try{
+  localStorage.setItem(KEY,JSON.stringify(state));
+  if(showMessage) toast("Saved successfully ✓");
+  return true;
+ }catch(e){
+  toast("Storage is full or unavailable. Export your data for backup.");
+  return false;
+ }
+}
+function toast(message){
+ const el=$("toast");
+ el.textContent=message;el.classList.add("show");
+ clearTimeout(toastTimer);
+ toastTimer=setTimeout(()=>el.classList.remove("show"),2400);
+}
+function updateClock(){
+ const d=new Date();
+ $("clock").textContent=d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+ $("dateLabel").textContent=d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+ $("sideDate").textContent=d.toLocaleDateString([],{weekday:"long",month:"long",day:"numeric"});
+ $("greeting").textContent=(d.getHours()<12?"Good morning.":d.getHours()<17?"Good afternoon.":"Good evening.");
+ if(state.habitsDate!==today()){
+  state.habits.forEach(h=>h.done=false);state.habitsDate=today();persist();render();
+ }
+}
+function taskHTML(t){
+ return `<div class="task ${t.done?"done":""}">
+ <input class="check task-check" type="checkbox" data-id="${escapeHTML(t.id)}" ${t.done?"checked":""} aria-label="Complete ${escapeHTML(t.title)}">
+ <div class="task-info"><div class="task-title">${escapeHTML(t.title)}</div><div class="task-meta">Added ${escapeHTML(t.created||"today")}</div></div>
+ <span class="priority ${escapeHTML(t.priority)}">${escapeHTML(t.priority)}</span>
+ <button class="icon-btn delete-task" data-id="${escapeHTML(t.id)}" aria-label="Delete task">×</button>
+ </div>`;
+}
+function renderTasks(){
+ const all=state.tasks;
+ $("taskList").innerHTML=filterTasks(all).map(taskHTML).join("")||'<div class="empty">No tasks here yet.<br>Add a task above and make a little progress.</div>';
+ $("dashTasks").innerHTML=all.filter(t=>!t.done).slice(0,4).map(taskHTML).join("")||'<div class="empty">Your mission list is clear. ✦<br>Add a task whenever you are ready.</div>';
+}
+function filterTasks(all){
+ return all.filter(t=>filter==="All"||filter==="Pending"&&!t.done||filter==="Completed"&&t.done||filter==="High"&&t.priority==="High");
+}
+function renderGoals(){
+ const markup=state.goals.map(g=>`<div class="goal">
+ <div class="goal-row"><strong>${escapeHTML(g.name)}</strong><span class="muted">${g.progress}%</span></div>
+ <div class="progress"><span style="width:${g.progress}%"></span></div>
+ <div class="save-line"><button class="small-btn goal-minus" data-id="${escapeHTML(g.id)}">− 10%</button><button class="small-btn goal-plus" data-id="${escapeHTML(g.id)}">+ 10%</button><button class="icon-btn delete-goal" data-id="${escapeHTML(g.id)}" aria-label="Delete goal">×</button></div>
+ </div>`).join("")||'<div class="empty">No goals yet. Add one small thing you want to work towards.</div>';
+ $("goalList").innerHTML=markup;
+ $("dashGoals").innerHTML=state.goals.slice(0,3).map(g=>`<div class="goal"><div class="goal-row"><strong>${escapeHTML(g.name)}</strong><span class="muted">${g.progress}%</span></div><div class="progress"><span style="width:${g.progress}%"></span></div></div>`).join("")||'<div class="empty">Your goals will appear here.</div>';
+}
+function habitHTML(h){
+ return `<label class="habit ${h.done?"done":""}"><span>${h.done?"✓":"✧"}</span><span>${escapeHTML(h.name)}</span><input class="check habit-check" type="checkbox" data-id="${escapeHTML(h.id)}" ${h.done?"checked":""} aria-label="Mark ${escapeHTML(h.name)} complete"><button type="button" class="icon-btn delete-habit" data-id="${escapeHTML(h.id)}" aria-label="Delete habit">×</button></label>`;
+}
+function renderHabits(){
+ $("habitList").innerHTML=state.habits.map(habitHTML).join("")||'<div class="empty">Add a habit to begin.</div>';
+ $("dashHabits").innerHTML=state.habits.map(habitHTML).join("")||'<div class="empty">Add a habit in Goals.</div>';
+}
+function renderStats(){
+ const total=state.tasks.length,done=state.tasks.filter(t=>t.done).length;
+ const pct=total?Math.round(done/total*100):0;
+ $("statTotal").textContent=total;$("statDone").textContent=done;
+ $("statProgress").textContent=pct+"%";$("progressBar").style.width=pct+"%";
+ $("statHabits").textContent=state.habits.filter(h=>h.done).length+"/"+state.habits.length;
+}
+function renderNotes(){
+ $("savedNotes").innerHTML=state.notes.map(n=>`<div class="task"><div class="task-info"><div class="task-title">${escapeHTML(n.title||"Untitled note")}</div><div class="task-meta">${escapeHTML(n.updated||"")}</div></div><button class="small-btn open-note" data-id="${escapeHTML(n.id)}">Open</button><button class="icon-btn delete-note" data-id="${escapeHTML(n.id)}" aria-label="Delete note">×</button></div>`).join("")||'<div class="empty">No saved notes yet.</div>';
+}
+function render(){
+ renderTasks();renderGoals();renderHabits();renderStats();renderNotes();
+}
+function showPage(page){
+ document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id==="page-"+page));
+ document.querySelectorAll(".nav[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+document.addEventListener("click",e=>{
+ const nav=e.target.closest("[data-page]");
+ if(nav) showPage(nav.dataset.page);
+ const go=e.target.closest("[data-go]");
+ if(go) showPage(go.dataset.go);
+ const f=e.target.closest("[data-filter]");
+ if(f){
+  filter=f.dataset.filter;
+  document.querySelectorAll("[data-filter]").forEach(b=>b.classList.toggle("active",b.dataset.filter===filter));
+  renderTasks();
+ }
+ const tc=e.target.closest(".delete-task");
+ if(tc){state.tasks=state.tasks.filter(t=>t.id!==tc.dataset.id);persist();render();toast("Task deleted.");}
+ const gp=e.target.closest(".goal-plus");
+ if(gp){const g=state.goals.find(x=>x.id===gp.dataset.id);if(g)g.progress=Math.min(100,g.progress+10);persist();renderGoals();}
+ const gm=e.target.closest(".goal-minus");
+ if(gm){const g=state.goals.find(x=>x.id===gm.dataset.id);if(g)g.progress=Math.max(0,g.progress-10);persist();renderGoals();}
+ const dg=e.target.closest(".delete-goal");
+ if(dg){state.goals=state.goals.filter(g=>g.id!==dg.dataset.id);persist();render();toast("Goal removed.");}
+ const dh=e.target.closest(".delete-habit");
+ if(dh){e.preventDefault();state.habits=state.habits.filter(h=>h.id!==dh.dataset.id);persist();render();toast("Habit removed.");}
+ const dn=e.target.closest(".delete-note");
+ if(dn){state.notes=state.notes.filter(n=>n.id!==dn.dataset.id);if(state.activeNote===dn.dataset.id)clearNote();persist();renderNotes();toast("Note deleted.");}
+ const on=e.target.closest(".open-note");
+ if(on){const n=state.notes.find(x=>x.id===on.dataset.id);if(n){state.activeNote=n.id;$("noteTitle").value=n.title;$("noteBody").value=n.body;$("noteStatus").textContent="Editing saved note";showPage("notes");}}
+ const mode=e.target.closest("[data-minutes]");
+ if(mode){setTimer(Number(mode.dataset.minutes),mode.dataset.mode);document.querySelectorAll("[data-minutes]").forEach(b=>b.classList.toggle("active",b===mode));}
+});
+document.addEventListener("change",e=>{
+ if(e.target.matches(".task-check")){
+  const t=state.tasks.find(t=>t.id===e.target.dataset.id);if(t)t.done=e.target.checked;
+  persist();render();toast(t&&t.done?"Task completed ✓":"Task reopened.");
+ }
+ if(e.target.matches(".habit-check")){
+  const h=state.habits.find(h=>h.id===e.target.dataset.id);if(h)h.done=e.target.checked;
+  persist();renderHabits();renderStats();
+ }
+});
+$("taskForm").addEventListener("submit",e=>{
+ e.preventDefault();const title=$("taskInput").value.trim();if(!title)return;
+ state.tasks.unshift({id:uid(),title,priority:$("taskPriority").value,done:false,created:new Date().toLocaleDateString()});
+ $("taskInput").value="";persist();render();toast("New task added ✦");
+});
+$("goalForm").addEventListener("submit",e=>{
+ e.preventDefault();const name=$("goalInput").value.trim();if(!name)return;
+ state.goals.push({id:uid(),name,progress:0});$("goalInput").value="";
+ persist();renderGoals();toast("Goal created ✦");
+});
+$("habitForm").addEventListener("submit",e=>{
+ e.preventDefault();const name=$("habitInput").value.trim();if(!name)return;
+ state.habits.push({id:uid(),name,done:false});$("habitInput").value="";
+ persist();renderHabits();renderStats();toast("Habit added ✦");
+});
+function clearNote(){
+ state.activeNote=null;$("noteTitle").value="";$("noteBody").value="";
+ $("noteStatus").textContent="New note";
+}
+$("newNote").addEventListener("click",clearNote);
+$("saveNote").addEventListener("click",()=>{
+ const title=$("noteTitle").value.trim(),body=$("noteBody").value;
+ if(!title&&!body.trim()){toast("Write something first.");return;}
+ const note={id:state.activeNote||uid(),title:title||"Untitled note",body,updated:new Date().toLocaleString()};
+ const idx=state.notes.findIndex(n=>n.id===note.id);
+ if(idx>=0)state.notes[idx]=note;else state.notes.unshift(note);
+ state.activeNote=note.id;
+ if(persist()){renderNotes();$("noteStatus").textContent="Saved at "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
+});
+const quotes=[
+ "Your next chapter starts with one small step.",
+ "Progress is progress, even when it is quiet.",
+ "Make space for what matters.",
+ "You do not need to do everything today.",
+ "Consistency grows from small beginnings."
+];
+$("dailyQuote").textContent=quotes[new Date().getDate()%quotes.length];
+
+function setTimer(minutes,mode){
+ pauseTimer();timerMode=mode;timerDuration=minutes*60;remaining=timerDuration;
+ $("timerCaption").textContent=mode+" · Ready when you are.";
+ updateTimerDisplay();
+}
+function updateTimerDisplay(){
+ const mm=String(Math.floor(remaining/60)).padStart(2,"0");
+ const ss=String(remaining%60).padStart(2,"0");
+ $("timerDisplay").textContent=mm+":"+ss;
+ $("focusTimerDisplay").textContent=mm+":"+ss;
+ $("timerCaption").textContent=running?timerMode+" session in progress":timerMode+" · "+(remaining===0?"Session complete!":"Ready when you are.");
+ $("focusTimerCaption").textContent=$("timerCaption").textContent;
+ $("timerStart").textContent=running?"Ⅱ Pause":"▶ Start";
+ $("focusStart").textContent=running?"Ⅱ Pause":"▶ Start focus";
+}
+function pauseTimer(){
+ running=false;clearInterval(timerInterval);timerInterval=null;timerEnd=null;
+}
+function startTimer(){
+ if(running){pauseTimer();updateTimerDisplay();return;}
+ if(remaining<=0)remaining=timerDuration;
+ running=true;timerEnd=Date.now()+remaining*1000;
+ timerInterval=setInterval(()=>{
+  remaining=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));
+  if(remaining<=0){
+   pauseTimer();remaining=0;updateTimerDisplay();
+   toast(timerMode+" session complete! Take a moment for yourself.");
+   try{if("Notification" in window&&Notification.permission==="granted")new Notification("NEXORA",{body:timerMode+" session complete!"});}catch(e){}
+  }else updateTimerDisplay();
+ },250);
+ updateTimerDisplay();
+}
+function resetTimer(){pauseTimer();remaining=timerDuration;updateTimerDisplay();}
+$("timerStart").addEventListener("click",startTimer);
+$("focusStart").addEventListener("click",startTimer);
+$("timerReset").addEventListener("click",resetTimer);
+$("focusReset").addEventListener("click",resetTimer);
+
+$("exportBtn").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="nexora-backup-"+today()+".json";
+ document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+ toast("Backup exported. Keep it somewhere safe.");
+});
+
+loadState();render();updateClock();updateTimerDisplay();
+setInterval(updateClock,1000);
+</script>
+</body>
+</html>
